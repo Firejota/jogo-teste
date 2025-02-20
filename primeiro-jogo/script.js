@@ -83,6 +83,9 @@ function verificaColisao(){
 
 function gameOver(){
     perdeu = true;
+    obstaculo.velocidade = 0
+    personagem.velocidadey = 0
+    gravidade = 0;
     atualizaObstaculo();
     ctx.fillStyle = 'red';
     ctx.fillRect((canvas.width / 2) - 200, (canvas.height / 2) - 70, 400, 100);
