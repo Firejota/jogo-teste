@@ -9,16 +9,22 @@
         body{
             display: flex;
             background-color: black;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
         }
         canvas{
-            margin-top: 100px;
+            
             background-color: white;
+        }
+        h1{
+            margin-top: 100px;
+            color: aliceblue;
         }
     </style>
 </head>
 <body>
+    <h1 id="pontos">Pontuação: 0</h1>
     <canvas id="jogoCanvas" width="800" height="400"></canvas>
     <script src="script.js"></script>
 </body>
