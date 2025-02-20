@@ -83,10 +83,9 @@ function verificaColisao(){
 
 function gameOver(){
     perdeu = true;
-    obstaculo.velocidade = 0;
     atualizaObstaculo();
     ctx.fillStyle = 'red';
-    ctx.fillRect((canvas.width / 2) - 200, (canvas.height / 2) - 50, 400, 100);
+    ctx.fillRect((canvas.width / 2) - 200, (canvas.height / 2) - 70, 400, 100);
     ctx.fillStyle = 'black';
     ctx.font = '50px Arial';
     ctx.fillText("GAME OVER", (canvas.width/2) - 150, (canvas.height/2))
