@@ -1,6 +1,12 @@
 const canvas = document.getElementById('jogoCanvas')
 const ctx = canvas.getContext('2d')
 let gameOver = false
+let pontos = 0;
+let jaPontuou = false;
+let indexObstaculo = 0;
+let pontuacaoMaxima = localStorage.getItem('pontuacaoMaxima') ? parseInt(localStorage.getItem('pontuacaoMaxima')) : 0
+
+document.getElementById('pontuacaoMaxima').innerHTML = `Pontuação Máxima: ${pontuacaoMaxima}`;
 
 class Entidade {
     #gravidade
@@ -21,6 +27,20 @@ class Entidade {
     }
     getGravidade() {
         return this.#gravidade;
+    }
+    setGravidade() {
+        this.#gravidade = 0;
+    }
+    atualizaPontuacao = function (){    
+        if(personagem.x > obstaculos[indexObstaculo].x && gameOver == false && jaPontuou == false){
+            pontos += (obstaculos[indexObstaculo].getVelocidadeX() * 10)
+            console.log((obstaculos[indexObstaculo].getVelocidadeX() * 5))
+            document.getElementById('pontuacao').innerHTML = `Pontos: ${parseInt(pontos)}`
+            if(pontos > pontuacaoMaxima){
+                localStorage.setItem('pontuacaoMaxima', pontos)
+            }
+            jaPontuou = true;
+        }
     }
 }
 class Personagem extends Entidade{
@@ -59,14 +79,18 @@ class Personagem extends Entidade{
         }
     }
     #houveColisao = function (obstaculo){
+        personagem.pararPersonagem()
+        personagem.setGravidade()
         obstaculo.pararObstaculo()
-        obstaculo.atualizar()
         ctx.fillStyle='red'
-        ctx.fillRect((canvas.width/2)-200,(canvas.height/2)-50,400,100)
+        ctx.fillRect((canvas.width/2)-200,(canvas.height/2)-70,400,100)
         ctx.fillStyle='black'
         ctx.font="50px Arial"
         ctx.fillText("GAME OVER",(canvas.width/2)-150,(canvas.height/2))
         gameOver=true
+    }
+    pararPersonagem = function (){
+        this.#velocidadey = 0;
     }
 
 }
@@ -82,10 +106,9 @@ class Obstaculo extends Entidade{
     atualizar = function(){
         this.x -= this.getVelocidadeX()
         if (this.x <= 0-this.largura){
+            indexObstaculo = Math.floor(Math.random() * 3)
+            jaPontuou = false;
             this.x = canvas.width-100
-            let altura_random = (Math.random() * 50)+90
-            this.altura = altura_random
-            this.y = canvas.height - altura_random
             this.#velocidadex += 0.5
         }
     }
@@ -94,7 +117,11 @@ class Obstaculo extends Entidade{
     }
 }
 
-const obstaculo = new Obstaculo(canvas.width-100,canvas.height-100,50,100)
+const obstaculos = [];
+obstaculos.push(new Obstaculo(canvas.width-100,canvas.height-120,50,120))
+obstaculos.push(new Obstaculo(canvas.width-100,canvas.height-160,50,80))
+obstaculos.push(new Obstaculo(canvas.width-100,canvas.height-60,100,60))
+
 const personagem = new Personagem(50, canvas.height-50, 50, 50)
 
 document.addEventListener("click", (e) => {
@@ -104,7 +131,7 @@ document.addEventListener("click", (e) => {
 })
 
 document.addEventListener('keypress', (e) =>{
-    if (e.code == 'Space' && personagem.isPersonagemPulando() == false){
+    if (e.code == 'Space' && personagem.isPersonagemPulando() == false && gameOver == false){
         // personagem.velocidadey = -15
         // personagem.pulando = true
         personagem.saltar()
@@ -112,18 +139,16 @@ document.addEventListener('keypress', (e) =>{
 })
 
 function loop () {
+    document.getElementById('pontuacaoMaxima').innerHTML = `Pontuação Máxima: ${parseInt(localStorage.getItem('pontuacaoMaxima'))}`
     ctx.clearRect(0,0,canvas.width, canvas.height)
-
-    obstaculo.desenhar(ctx, 'red')
+    obstaculos[indexObstaculo].desenhar(ctx, 'red')
     personagem.desenhar(ctx, 'white')
-    personagem.verificarColisao(obstaculo)
-    obstaculo.atualizar()
+    personagem.verificarColisao(obstaculos[indexObstaculo])
+    obstaculos[indexObstaculo].atualizar()
     personagem.atualizar()
+    obstaculos[indexObstaculo].atualizaPontuacao();
     requestAnimationFrame(loop)
 }
 
 loop()
-
-// adicionar multiplos objetos
-// adicionar pontuação
 // aplicar polimorfismo para mudar o desenho do personagem
